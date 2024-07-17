@@ -1,3 +1,7 @@
-const controllers = <any>[];
+import Person from "./person/Person";
 
-export {controllers};
+type Controller = typeof Person;
+
+const controllers = <Controller[]>[Person];
+
+export { controllers };
