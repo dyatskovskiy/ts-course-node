@@ -4,6 +4,8 @@ import { ApiError } from "helpers/ApiError";
 import { ApiResponse } from "helpers/ApiResponse";
 
 import { IPerson } from "./Person.types";
+import { CreatePerson } from "./CreatePerson.dto";
+import { validate } from "class-validator";
 
 const storeData: IPerson[] = [];
 
@@ -29,8 +31,20 @@ export default class Person {
   }
 
   @Post()
-  async setPerson(@Body() body: IPerson) {
-    storeData.push(body);
+  async setPerson(@Body() body: CreatePerson) {
+    const errors = await validate(body);
+
+    if (errors.length > 0) {
+      throw new ApiError(400, {
+        code: "PERSON_VALIDATION_ERROR",
+        message: "Validation failed",
+        errors,
+      });
+    }
+
+    const id = storeData.length;
+
+    storeData.push({ ...body, id });
 
     return new ApiResponse(true, "Person successfully created");
   }
